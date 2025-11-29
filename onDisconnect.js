@@ -1,31 +1,10 @@
-// lambda/sendMessage.js
-const AWS = require("aws-sdk");
+// backend/onDisconnect.js
+// Simulate a user disconnect
+function onDisconnect(connectionId, connections){
+    const index = connections.indexOf(connectionId);
+    if(index > -1) connections.splice(index,1);
+    console.log("Disconnected:", connectionId);
+}
 
-const db = new AWS.DynamoDB.DocumentClient();
-
-exports.handler = async (event) => {
-    const message = JSON.parse(event.body).message;
-
-    const allConnections = await db.scan({
-        TableName: "ChatConnections"
-    }).promise();
-
-    const apigw = new AWS.ApiGatewayManagementApi({
-        endpoint: event.requestContext.domainName + "/" + event.requestContext.stage
-    });
-
-    const sendToAll = allConnections.Items.map(async ({ connectionId }) => {
-        try {
-            await apigw.postToConnection({
-                ConnectionId: connectionId,
-                Data: message
-            }).promise();
-        } catch (err) {
-            console.log("Failed:", connectionId);
-        }
-    });
-
-    await Promise.all(sendToAll);
-
-    return { statusCode: 200, body: "Message sent" };
-};
+// Export for frontend simulation
+if (typeof module !== 'undefined') module.exports = { onDisconnect };
