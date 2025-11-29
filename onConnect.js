@@ -1,15 +1,11 @@
-// lambda/onConnect.js
-const AWS = require("aws-sdk");
-const db = new AWS.DynamoDB.DocumentClient();
+// backend/onConnect.js
+// Simulate a new user connection
+let connections = [];
 
-exports.handler = async (event) => {
-    const connectionId = event.requestContext.connectionId;
+function onConnect(connectionId){
+    connections.push(connectionId);
+    console.log("Connected:", connectionId);
+}
 
-    await db.put({
-        TableName: "ChatConnections",
-        Item: { connectionId }
-    }).promise();
-
-    return { statusCode: 200, body: "Connected" };
-};
-
+// Export for frontend simulation (if needed)
+if (typeof module !== 'undefined') module.exports = { onConnect, connections };
